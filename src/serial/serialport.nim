@@ -49,3 +49,10 @@ proc write*(port: SerialPort | AsyncSerialPort, buff: string): Future[int32] {.m
 
   var copy = buff
   result = await port.write(addr copy[0], int32(len(copy)))
+
+proc writeAll*(port: SerialPort | AsyncSerialPort, buff: string) {.multisync.} =
+  ## Write the entirety of `buff` to the serial port `port`
+  var written = 0
+  while written < buff.len:
+    let rest = buff[written..<buff.len]
+    inc(written, await port.write(rest))
